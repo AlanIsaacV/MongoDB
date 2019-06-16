@@ -3,34 +3,41 @@ MongoDB Usos y comandos
 INDICE 
 ------
 + [Como empezar](#Como-empezar) 
-    + [Iniciar servidor](#Iniciar-servidor)
+    + [Iniciar servidor - **mongod | mongo**](#Iniciar-servidor)
         + [Cofigurar teminal](#Configurar-MongoDB-y-CMD)
     + [Comandos basicos](#Comandos-basicos)
-        + [Mostrar DBs](#Mostrar-las-Bases-de-Datos)
-        + [Crear DB](#Crear-DB)
-        + [Mostrar DBs en uso](#Mostrar-Base-de-Datos-en-uso)
-        + [Crear Coleccion (Implicito)](#Crear-coleccion-de-manera-implicita-/-Insertar-datos-en-Coleccion)
-        + [Crear Coleccion (Explicito)](#Crear-coleccion-de-manera-explicita)
-        + [Mostrar Colecciones](#Mostrar-Colecciones)
-        + [Eliminar Coleccion](#Eliminar-coleccion)
-        + [Eliminar DB](#Eliminar-DB)
+        + [Mostrar DBs - **show dbs**](#Mostrar-las-Bases-de-Datos)
+        + [Crear DB - **use {db}**](#Crear-DB)
+        + [Mostrar DBs en uso- **db**](#Mostrar-Base-de-Datos-en-uso)
+        + [Crear Coleccion (Implicito) - **.insert()**](#Crear-coleccion-de-manera-implicita-/-Insertar-datos-en-Coleccion)
+        + [Crear Coleccion (Explicito) - **createCollection()**](#Crear-coleccion-de-manera-explicita)
+        + [Mostrar Colecciones - **show collections**](#Mostrar-Colecciones)
+        + [Eliminar Coleccion - **.drop()**](#Eliminar-coleccion)
+        + [Eliminar DB - **dropDatabase()**](#Eliminar-DB)
 + [CRUD](#crud)
     + [Crear](#Crear)
-        + [Un documento](#Un-documento)
-        + [Varios documentos](#Varios-documentos)
+        + [Un documento - **.insert()**](#Un-documento)
+        + [Varios documentos - **.insert()**](#Varios-documentos)
     + [Mostrar](#Mostrar)
-        + [Todos](#Todos)
-        + [Formato](#Formato)
-        + [Solo uno](#Solo-uno)
-        + [Parametro de busqueda](#parametro-de-busqueda)
-        + [Filtro de campos](#Filtro-de-campos)
+        + [Todos - **.find()**](#Todos)
+        + [Formato - **.find().pretty()**](#Formato)
+        + [Solo uno - **.findOne()**](#Solo-uno)
+        + [Parametro de busqueda - **.find( { } )**](#parametro-de-busqueda)
+        + [Filtro de campos - **.find( { }, { } )**](#Filtro-de-campos)
+        + [forEach - **.find().forEach()**](#forEach)
+        + [Count - **.find().count()**](#count)
     + [Actualizar](#Actualizar)
+        + [save - **.save()**](#save)
+        + [update - **.update()**](#update)
     + [Eliminar](#Eliminar)
+        + [remove - **.remove()**](#remove)
 + [Funciones](#Funciones) 
     + [Varibles](#Variables)
     + [Operadores](#Operadores)
         + [Comparacion](#Comparacion)
         + [Logicos](#Logicos)
+    + [Bucles](#Bucles)
+        + [for](#for)
 
 
 
@@ -362,6 +369,40 @@ ___
     El _id siempre se mostrara al menos que se excluya manualmente
 ___
 
+<br><br>
+
+### **forEach** 
+_db._**nombreColeccion**_.find.().forEach(_
+**bloqueDeFunciones**
+_)_
+
+```javascript
+> db.cicloFor.find().forEach(
+... function(d){ print( d.valor ) }
+... )
+```
+```javascript
+0                     
+1
+2
+3
+...
+100
+```
+
+<br><br>
+
+### **count** 
+_db._**nombreColeccion**_.find.().count()_
+
+```javascript
+> db.cicloFor.find().count()
+```
+```javascript
+101
+```
+
+
 <br><br><br><br>
 
 ## Actualizar
@@ -466,7 +507,7 @@ ___
     Igualmente si se accede a un atributo que no existe este se crea
 ___
 
-<br><br>
+<br><br><br><br>
 
 ## Operadores
 ### **Comparacion**
@@ -497,3 +538,22 @@ ___
 ```
 
 
+<br><br><br><br>
+
+## Bucles
+### **for** 
+_for(_ **varContador** _;_ **limiteCiclo** _;_ **aumento/decremento**_) {_ **funciones** _}_
+
+##### *shell*
+```javascript
+> for(i = 0; i <= 100; i++){
+... db.cicloFor.insert({valor: i})
+... }
+```
+```javascript
+WriteResult({ "nInserted" : 1 })
+```
+
+Esto inserta valores del 0 al 100 en la coleccion **cicloFor**
+
+<br><br>
