@@ -9,32 +9,39 @@ INDICE
         + [Mostrar DBs - **show dbs**](#Mostrar-las-Bases-de-Datos)
         + [Crear DB - **use {db}**](#Crear-DB)
         + [Mostrar DBs en uso- **db**](#Mostrar-Base-de-Datos-en-uso)
-        + [Crear Coleccion (Implicito) - **.insert()**](#Crear-coleccion-de-manera-implicita-/-Insertar-datos-en-Coleccion)
-        + [Crear Coleccion (Explicito) - **createCollection()**](#Crear-coleccion-de-manera-explicita)
+        + [Crear Coleccion (Implicito) - **.insert( )**](#Crear-coleccion-de-manera-implicita-/-Insertar-datos-en-Coleccion)
+        + [Crear Coleccion (Explicito) - **createCollection( )**](#Crear-coleccion-de-manera-explicita)
         + [Mostrar Colecciones - **show collections**](#Mostrar-Colecciones)
-        + [Eliminar Coleccion - **.drop()**](#Eliminar-coleccion)
-        + [Eliminar DB - **dropDatabase()**](#Eliminar-DB)
+        + [Eliminar Coleccion - **.drop( )**](#Eliminar-coleccion)
+        + [Eliminar DB - **dropDatabase( )**](#Eliminar-DB)
 + [CRUD](#crud)
     + [Crear](#Crear)
-        + [Un documento - **.insert()**](#Un-documento)
-        + [Varios documentos - **.insert()**](#Varios-documentos)
+        + [Un documento - **.insert( )**](#Un-documento)
+        + [Varios documentos - **.insert( )**](#Varios-documentos)
+        + [Arreglos - **.insert( )**](#Arreglos)
     + [Mostrar](#Mostrar)
-        + [Todos - **.find()**](#Todos)
-        + [Formato - **.find().pretty()**](#Formato)
-        + [Solo uno - **.findOne()**](#Solo-uno)
+        + [Todos - **.find( )**](#Todos)
+        + [Solo uno - **.findOne( )**](#Solo-uno)
         + [Parametro de busqueda - **.find( { } )**](#parametro-de-busqueda)
         + [Filtro de campos - **.find( { }, { } )**](#Filtro-de-campos)
-        + [forEach - **.find().forEach()**](#forEach)
-        + [count - **.find().count()**](#count)
-        + [sort - **.find().sort()**](#sort)
-        + [limit - **.find().limit()**](#limit)
-        + [skip - **.find().skip()**](#skip)
-        + [count vs size **.find().size()**](#count-vs-size)
+        + [*Cursores* - **.find( )**](#cursores)
+            + [Formato - **.pretty( )**](#Formato)
+            + [forEach - **.forEach( )**](#forEach)
+            + [count - **.count( )**](#count)
+            + [sort - **.sort()**](#sort)
+            + [limit - **.limit( )**](#limit)
+            + [skip - **.skip( )**](#skip)
+            + [count vs size **.size( )**](#count-vs-size)
     + [Actualizar](#Actualizar)
-        + [save - **.save()**](#save)
-        + [update - **.update()**](#update)
+        + [save - **.save( )**](#save)
+        + [update - **.update( )**](#update)
+        + [Arreglos - **update( { }**](#update-arreglos)
+            + [Arreglos - **,{$push:{ } } )**](#Update---Arreglos-parte-1)
+            + [Arreglos (varios valores) - **,{$push: {$each: [ ] } } )**](#Update---Arreglos-parte-2)
+            + [Arreglos 3 - **,{$push:{ {$position } } } )**](#Update---Arreglos-parte-3)
+            + [Arreglos 4 - **,{$push:{ {$sort } } } )**](#Update---Arreglos-parte-4)
     + [Eliminar](#Eliminar)
-        + [remove - **.remove()**](#remove)
+        + [remove - **.remove( )**](#remove)
 + [Funciones](#Funciones) 
     + [Varibles](#Variables)
     + [Operadores](#Operadores)
@@ -263,6 +270,31 @@ BulkWriteResult({
 })
 ```
 
+<br><br>
+### **Arreglos**
+_db._**nombreColeccion**_.insert ( {_
+**nombreArreglo** _: [_ **valor1, valor2, ...** _] } )_
+##### *shell*
+```javascript
+> db.prueba.insert([
+... {nombre: "test 1", miArreglo: [1, 5, 7, 9] },
+... {nombre: "test 2", miArreglo: [8, 4, 3] }
+... ] )
+```
+```javascript
+BulkWriteResult({
+        "writeErrors" : [ ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 2,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+})
+```
+
+
 <br><br><br><br>
 
 ## Mostrar
@@ -276,33 +308,6 @@ _db._**nombreColeccion**_.find()_
 { "_id" : ObjectId("5d057016581553215508f3bc"), "nombre" : "Alan", "edad" : 20 }
 { "_id" : ObjectId("5d057354581553215508f3bd"), "nombre" : "Isaac", "edad" : 20, "activo" : true }
 { "_id" : ObjectId("5d057354581553215508f3be"), "nombre" : "Fernanda", "edad" : 21 }
-```
-
-<br><br>
-
-### **Formato**
-_db._**nombreColeccion**_.find().pretty()_
-##### *shell*
-```javascript
-> db.persona.find().pretty()
-```
-```javascript
-{
-        "_id" : ObjectId("5d057016581553215508f3bc"),
-        "nombre" : "Alan",
-        "edad" : 20
-}
-{
-        "_id" : ObjectId("5d057354581553215508f3bd"),
-        "nombre" : "Isaac",
-        "edad" : 20,
-        "activo" : true
-}
-{
-        "_id" : ObjectId("5d057354581553215508f3be"),
-        "nombre" : "Fernanda",
-        "edad" : 21
-}
 ```
 
 <br><br>
@@ -340,7 +345,7 @@ _db._**nombreColeccion**_.find( {_ **parametrosBusqueda** _} )_
 
 <br><br>
  
-### **Campos a mostrar**
+### **Filtro de campos**
 _db._**nombreColeccion**_.find(_
 _{_ **parametrosBusqueda** _},_ 
 _{_ **campo1** _:_ **1**_,_ **campo2** _:_ **0**_,_ **...** _} )_
@@ -376,10 +381,40 @@ ___
 <br><br>
 
 ### **Cursores**
+#### **Formato**
+_db._**nombreColeccion**_.find().pretty()_
+##### *shell*
+```javascript
+> db.persona.find().pretty()
+```
+```javascript
+{
+        "_id" : ObjectId("5d057016581553215508f3bc"),
+        "nombre" : "Alan",
+        "edad" : 20
+}
+{
+        "_id" : ObjectId("5d057354581553215508f3bd"),
+        "nombre" : "Isaac",
+        "edad" : 20,
+        "activo" : true
+}
+{
+        "_id" : ObjectId("5d057354581553215508f3be"),
+        "nombre" : "Fernanda",
+        "edad" : 21
+}
+```
+
+<br><br>
+
 #### **forEach** 
 _db._**nombreColeccion**_.find.().forEach(_
 **bloqueDeFunciones**
 _)_
+
+    Recorre la lista de documentos de una coleccion
+
 ##### *shell*
 ```javascript
 > db.cicloFor.find().forEach(
@@ -567,6 +602,169 @@ _{  multi:_ **boolean** _} )_
 ```javascript
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
+
+<br><br>
+
+#### **Update - Arreglos Parte 1**
+_db._**nombreColeccion**_.update(_ 
+
+_{_ **valoresBusqueda** _},_
+
+_{ $push : {_ **valoresAñadir** _} )_
+
+<br>
+
+_db._**nombreColeccion**_.update( { },_
+
+_{_ _$addToSet : {_ **valoresAñadir** _} )_
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test , "miArreglo" : [ 8, 4, 3] }
+```
+##### *shell*
+```javascript
+> db.prueba.update( {}, {$addToSet: {miArreglo: 2} })
+```
+```javascript
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 8, 4, 3, 2] }
+```
+
+<br>
+
+##### *shell*
+```javascript
+> db.prueba.update( {}, {$addToSet: {miArreglo: [6, 0]} })
+```
+```javascript
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 8, 4, 3, 2, [ 6, 0 ] ] }
+```
+
+##### ***Nota 1***
+    Si el elemento ya existe dentro del Array este ya no se volvera ha agregar.
+    $push: permite agregar elementos existentes en el array
+
+<br><br>
+#### **Update - Arreglos Parte 2**
+_db._**nombreColeccion**_.update( { },_
+_{ $push : {_ **nombreArreglo** _:_
+_{ $each : [_ **valor1, valor2, ...**  _]_
+_} )_
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 8, 4, 3 ] }
+```
+##### *shell*
+```javascript
+> db.prueba.update( {},
+... {$push: { miArreglo :
+... {$each: [2, 3, 6] }
+... } } )
+```
+```javascript
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 8, 4, 3, 2, 3, 6 ] }
+```
+
+##### ***Nota 1***
+    En lugar de usar $push tambien se peuede utilizar $addToSet
+
+<br><br>
+#### **Update - Arreglos Parte 3**
+_db._**nombreColeccion**_.update( { },_
+_{ $push : {_ **nombreArreglo** _:_
+_{ $position :_ **indiceArreglo**
+_} )_
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 8, 4, 3 ] }
+```
+##### *shell*
+```javascript
+> db.prueba.update( {},
+... {$push: { miArreglo :
+... {$each: [2, 3, 6], $position: 1}
+... } } )
+```
+```javascript
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 8, 2, 3, 6, 4, 3 ] }
+```
+
+##### ***Nota 1***
+    El metodo $position solo esta disponible con $push
+
+<br><br>
+#### **Update - Arreglos Parte 4**
+_db._**nombreColeccion**_.update( { },_
+_{ $push : {_ **nombreArreglo** _:_
+_{ $sort :_ **[1/-1]**
+_} )_
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 8, 4, 3 ] }
+```
+##### *shell*
+```javascript
+> db.prueba.update( {},
+... {$push: { miArreglo :
+... {$each: [2, 3, 6], $sort: 1}
+... } } )
+```
+```javascript
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+##### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 2, 3, 3, 4, 6, 8 ] }
+```
+
+##### ***Nota 1***
+    Este metodo se puede usar para ordenar el arreglo sino se le pasa ningun valor
+
+
+
+
 
 <br><br><br><br>
 
