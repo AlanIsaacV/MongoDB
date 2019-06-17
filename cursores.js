@@ -1,2 +1,0 @@
-db.supervisores.find().forEach( function(d) {print(d.apellido)}) 	//? recorre la coleccion ejecutando la funcion, es este caso la funcion es imprimir el campo apellido de cada documento, se pueden asignar valores, eliminar
-db.supervisores.find().forEach( function(d) {d.apellido = "adios"; db.supervisores.save(d); print(d.nombre + "  " + d.apellido )})
