@@ -25,7 +25,11 @@ INDICE
         + [Parametro de busqueda - **.find( { } )**](#parametro-de-busqueda)
         + [Filtro de campos - **.find( { }, { } )**](#Filtro-de-campos)
         + [forEach - **.find().forEach()**](#forEach)
-        + [Count - **.find().count()**](#count)
+        + [count - **.find().count()**](#count)
+        + [sort - **.find().sort()**](#sort)
+        + [limit - **.find().limit()**](#limit)
+        + [skip - **.find().skip()**](#skip)
+        + [count vs size **.find().size()**](#count-vs-size)
     + [Actualizar](#Actualizar)
         + [save - **.save()**](#save)
         + [update - **.update()**](#update)
@@ -371,11 +375,12 @@ ___
 
 <br><br>
 
-### **forEach** 
+### **Cursores**
+#### **forEach** 
 _db._**nombreColeccion**_.find.().forEach(_
 **bloqueDeFunciones**
 _)_
-
+##### *shell*
 ```javascript
 > db.cicloFor.find().forEach(
 ... function(d){ print( d.valor ) }
@@ -390,11 +395,11 @@ _)_
 100
 ```
 
-<br><br>
+<br>
 
-### **count** 
+#### **count** 
 _db._**nombreColeccion**_.find.().count()_
-
+##### *shell*
 ```javascript
 > db.cicloFor.find().count()
 ```
@@ -402,6 +407,115 @@ _db._**nombreColeccion**_.find.().count()_
 101
 ```
 
+<br>
+
+#### **sort** 
+_db._**nombreColeccion**_.find.().sort(_ 
+_{_ **campoOrdenar** _:_ **[1/-1]** _} )_
+##### *shell*
+```javascript
+> db.orden.insert([
+... {valor: "f"},
+... {valor: "c"},
+... {valor: "a"},
+... {valor: "ab"},
+... {valor: "aa"}
+... ])
+```
+```javascript
+BulkWriteResult({
+        "writeErrors" : [ ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 5,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+})
+```
+##### *shell*
+```javascript
+> db.orden.find({},{_id: 0}).sort({valor:1})
+```
+```javascript
+{ "valor" : "a" }
+{ "valor" : "aa" }
+{ "valor" : "ab" }
+{ "valor" : "c" }
+{ "valor" : "f" }
+```
+##### *shell*
+```javascript
+> db.orden.find({},{_id: 0}).sort({valor:-1})
+```
+```javascript
+{ "valor" : "f" }
+{ "valor" : "c" }
+{ "valor" : "ab" }
+{ "valor" : "aa" }
+{ "valor" : "a" }
+```
+___
+##### ***Nota 1***
+    Indicar el valor en el campo segun el orden deseado:
+         1 = ascendente
+        -1 = descendente 
+___
+
+<br>
+
+#### **limit**
+_db._**nombreColeccion**_.find.().limit(_ **numeroValoresMostrar** _)_
+##### *shell*
+```javascript
+> db.prueba.find({},{_id:0}).limit(5)
+```
+```javascript
+{ "valor" : 1 }
+{ "valor" : 2 }
+{ "valor" : 3 }
+{ "valor" : 4 }
+{ "valor" : 5 }
+```
+
+<br>
+
+#### **skip**
+_db._**nombreColeccion**_.find.().skip(_ **numeroValoresOmitir** _)_
+##### *shell*
+```javascript
+> db.prueba.find({},{_id:0}).skip(10).limit(5)
+```
+```javascript
+{ "valor" : 11 }
+{ "valor" : 12 }
+{ "valor" : 13 }
+{ "valor" : 14 }
+{ "valor" : 15 }
+```
+
+<br>
+
+#### **count vs size**
+_db._**nombreColeccion**_.find.( ).skip(_ **numeroValoresOmitidos** _).size( )_
+##### *shell*
+```javascript
+> db.prueba.find({},{_id:0}).sort({valor:1}).skip(10).size()
+```
+```javascript
+90
+```
+##### *shell*
+```javascript
+> db.prueba.find({},{_id:0}).skip(10).count()
+```
+```javascript
+100
+```
+##### ***Nota 1***
+    count: Devuelve el numero total de documentos encontrados dentro el metodo find()
+    size: Devuelve el numero de documentos restantes dentro del skip [count - skip]
 
 <br><br><br><br>
 
@@ -441,7 +555,7 @@ _{  multi:_ **boolean** _} )_
     $set: Establece que solo es campo se va ha modificar o crear. 
     Sino se coloca esta expresion se tendra que ingresar el documento completo
 
-    $unset: 
+    $unset: Elimina los campos que concidan con el valor indicado
 
     multi: Inidica que se van ha modificar todos los documentos que concidan con los campos de la busqueda en caso de que su valor sea "true".
     Sino se especifica el valor por default es "false" por lo que solo se modificara el primer documento que se encuentre
