@@ -22,25 +22,27 @@ INDICE
     + [Mostrar](#Mostrar)
         + [Todos - **.find( )**](#Todos)
         + [Solo uno - **.findOne( )**](#Solo-uno)
-        + [Parametro de busqueda - **.find( { } )**](#parametro-de-busqueda)
-        + [Filtro de campos - **.find( { }, { } )**](#Filtro-de-campos)
+        + [Parametro de busqueda - **.find( _{ }_ )**](#parametro-de-busqueda)
+        + [Filtro de campos - **.find( { }, _{ }_ )**](#Filtro-de-campos)
         + [*Cursores* - **.find( )**](#cursores)
             + [Formato - **.pretty( )**](#Formato)
             + [forEach - **.forEach( )**](#forEach)
             + [count - **.count( )**](#count)
-            + [sort - **.sort()**](#sort)
+            + [sort - **.sort( )**](#sort)
             + [limit - **.limit( )**](#limit)
             + [skip - **.skip( )**](#skip)
             + [count vs size **.size( )**](#count-vs-size)
     + [Actualizar](#Actualizar)
         + [save - **.save( )**](#save)
         + [update - **.update( )**](#update)
-        + [Arreglos - **update( { }**](#update-arreglos)
-            + [Arreglos - **,{$push:{ } } )**](#Update---Arreglos-parte-1)
-            + [Arreglos (varios valores) - **,{$push: {$each: [ ] } } )**](#Update---Arreglos-parte-2)
-            + [Arreglos 3 - **,{$push:{ {$position } } } )**](#Update---Arreglos-parte-3)
-            + [Arreglos 4 - **,{$push:{ {$sort } } } )**](#Update---Arreglos-parte-4)
-    + [Eliminar](#Eliminar)
+        + [Arreglos - **.update( { }, _{ }_ )**](#Arreglos)
+            + [Agregar - **$push: _{ }_**](#Agregar) 
+                + [push - **$push: _{ }_**](#push) 
+                + [each - **$each: [ ]**](#each)
+                + [position - **$position**](#position)
+                + [sort - **$sort**](#sort)
+            + [Eliminar](#Eliminar)
+    + [Eliminar](#crudEliminar)
         + [remove - **.remove( )**](#remove)
 + [Funciones](#Funciones) 
     + [Varibles](#Variables)
@@ -79,7 +81,7 @@ Si todo salio bien ya puedes acceder a los comandos de MongoDb desde el CMD
 <br><br>
 
 ### **Arrancar el servidor**
-##### *shell*
+###### *shell*
 ```javascript
 mongod
 ```
@@ -94,7 +96,7 @@ Para ingresar los comandos se necesita abir otra terminal de comandos ya que est
 
 Para ingresar todos los comandos tenemos que activar los comandos de MongoDB
 
-##### *shell*
+###### *shell*
 ```javascript
 mongo
 ```
@@ -104,7 +106,7 @@ Con esto ya podemos empezar a ingresar comandos
 
 ## Comandos basicos
 ### **Mostrar las Bases de Datos**
-##### *shell*
+###### *shell*
 ``` javascript
 > show dbs
 ```
@@ -116,7 +118,7 @@ local   0.000GB
 <br><br>
 
 ### **Crear DB**
-##### *shell*
+###### *shell*
 ```javasript
 > use Pruebas
 ```
@@ -124,14 +126,14 @@ local   0.000GB
 switched to db Pruebas
 ```
 ___
-##### ***Nota***
+###### ***Nota***
     Si la DB no existe entonces se va ha crear, pero esta no aparecera en la lista de DB hasta que se carguen datos en esta
 ___
 
 <br><br>
 
 ### **Mostrar Base de Datos en uso**
-##### *shell*
+###### *shell*
 ```javascript
 > db
 ```
@@ -147,7 +149,7 @@ Pruebas
 
 *db.*__nombreColeccion__.*insert([{* **documento1** _}, {_ **documento2** _},_ **...**_])_
 
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.insert({
 ... "nombre": "Alan",
@@ -158,9 +160,9 @@ Pruebas
 WriteResult({ "nInserted" : 1 }) 
 ```
 ___
-##### ***Nota 1***
+###### ***Nota 1***
     Se pueden insertar varias lineas en la terminal mientras no se cierren los parentesis de la funcion
-##### ***Nota 2***
+###### ***Nota 2***
     En caso de que no exista la Coleccion en la que se quieren insertar datos se crea la Coleccion
 ___
 
@@ -168,7 +170,7 @@ ___
 
 ### **Crear Coleccion de manera explicita**
 _db.createCollection("_**nombreColeccion**_")_
-##### *shell*
+###### *shell*
 ```javascript
 > db.createCollection("productos")
 ```
@@ -179,7 +181,7 @@ _db.createCollection("_**nombreColeccion**_")_
 <br><br>
 
 ### **Mostrar Colecciones**
-##### *shell*
+###### *shell*
 ```javascript
 > show collections
 ```
@@ -192,7 +194,7 @@ productos
  
 ### **Eliminar Coleccion**
 _db._**nombreColeccion**_.drop()_
-##### *shell*
+###### *shell*
 ```javascript
 > db.productos.drop()
 ```
@@ -203,7 +205,7 @@ true
 <br><br>
  
 ### **Eliminar DB**
-##### *shell*
+###### *shell*
 ```javascript
 > db.dropDatabase()
 ```
@@ -217,7 +219,7 @@ true
 ## Crear 
 ### **Un documento**
 _db._**nomreColeccion**_.insert({_ **nombreValor** _:_ **valor**_,_ **...**_})_
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.insert({ nombre: "Alan", edad: 20 })
 ```
@@ -225,15 +227,15 @@ _db._**nomreColeccion**_.insert({_ **nombreValor** _:_ **valor**_,_ **...**_})_
 WriteResult({ "nInserted" : 1 })
 ```
 ___
-##### ***Nota 1***
+###### ***Nota 1***
     Se pueden omitir las comillas en los nombres de los campos.
 
-##### ***Nota 2***
+###### ***Nota 2***
     MongoDB inserta un id por defaul cuando este se omite
         "_id": ObjectId("<<Hash>>")
     En caso de que se tenga un id personalizado para el documento es preferible usar el del documento.
     se tiene que especificar como {"_id": <<Valor_Unico>>}
-##### ***Nota 3***
+###### ***Nota 3***
     Se pueden insertar diferentes campos en la misma coleccion
         Cada documento puede tener sus propios campos distintos sin necesidad de alterar a los demas, como en caso de SQL
 ___
@@ -245,7 +247,7 @@ _db._**nombreColeccion**_.insert ( [ {_
 **documento1**_},_
 _{_ **documento2** _},_ 
 _{_ **...** _} ] )_
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.insert([
 ... {
@@ -274,7 +276,7 @@ BulkWriteResult({
 ### **Arreglos**
 _db._**nombreColeccion**_.insert ( {_
 **nombreArreglo** _: [_ **valor1, valor2, ...** _] } )_
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.insert([
 ... {nombre: "test 1", miArreglo: [1, 5, 7, 9] },
@@ -300,7 +302,7 @@ BulkWriteResult({
 ## Mostrar
 ### **Todos**
 _db._**nombreColeccion**_.find()_
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.find()
 ```
@@ -314,7 +316,7 @@ _db._**nombreColeccion**_.find()_
 
 ### **Solo uno**
 _db._**nombreColeccion**_.findOne()_
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.findOne()
 ```
@@ -329,7 +331,7 @@ _db._**nombreColeccion**_.findOne()_
 <br><br>
 
 ### **Parametro de busqueda**
-##### *shell*
+###### *shell*
 _db._**nombreColeccion**_.find( {_ **parametrosBusqueda** _} )_
 
 ```javascript
@@ -340,7 +342,7 @@ _db._**nombreColeccion**_.find( {_ **parametrosBusqueda** _} )_
 { "_id" : ObjectId("5d057354581553215508f3bd"), "nombre" : "Isaac", "edad" : 20, "activo" : true }
 ```
 
-##### ***Nota 1***
+###### ***Nota 1***
     Se pueden insertar los parametros que se desee dentro de los mismo corchetes separando por ","
 
 <br><br>
@@ -355,7 +357,7 @@ _Se especifica un 0 para excluir el valor_
 
 _Se especifica un 1 para mostrar el valor_
 
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.find({}, {_id:0})
 ```
@@ -364,7 +366,7 @@ _Se especifica un 1 para mostrar el valor_
 { "nombre" : "Isaac", "edad" : 20, "activo" : true }
 { "nombre" : "Fernanda", "edad" : 21 }
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.find({}, {nombre:1})
 ```
@@ -374,7 +376,7 @@ _Se especifica un 1 para mostrar el valor_
 { "_id" : ObjectId("5d057354581553215508f3be"), "nombre" : "Fernanda" }
 ```
 ___
-##### ***Nota 1*** 
+###### ***Nota 1*** 
     El _id siempre se mostrara al menos que se excluya manualmente
 ___
 
@@ -383,7 +385,7 @@ ___
 ### **Cursores**
 #### **Formato**
 _db._**nombreColeccion**_.find().pretty()_
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.find().pretty()
 ```
@@ -415,7 +417,7 @@ _)_
 
     Recorre la lista de documentos de una coleccion
 
-##### *shell*
+###### *shell*
 ```javascript
 > db.cicloFor.find().forEach(
 ... function(d){ print( d.valor ) }
@@ -434,7 +436,7 @@ _)_
 
 #### **count** 
 _db._**nombreColeccion**_.find.().count()_
-##### *shell*
+###### *shell*
 ```javascript
 > db.cicloFor.find().count()
 ```
@@ -447,7 +449,7 @@ _db._**nombreColeccion**_.find.().count()_
 #### **sort** 
 _db._**nombreColeccion**_.find.().sort(_ 
 _{_ **campoOrdenar** _:_ **[1/-1]** _} )_
-##### *shell*
+###### *shell*
 ```javascript
 > db.orden.insert([
 ... {valor: "f"},
@@ -469,7 +471,7 @@ BulkWriteResult({
         "upserted" : [ ]
 })
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.orden.find({},{_id: 0}).sort({valor:1})
 ```
@@ -480,7 +482,7 @@ BulkWriteResult({
 { "valor" : "c" }
 { "valor" : "f" }
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.orden.find({},{_id: 0}).sort({valor:-1})
 ```
@@ -492,7 +494,7 @@ BulkWriteResult({
 { "valor" : "a" }
 ```
 ___
-##### ***Nota 1***
+###### ***Nota 1***
     Indicar el valor en el campo segun el orden deseado:
          1 = ascendente
         -1 = descendente 
@@ -502,7 +504,7 @@ ___
 
 #### **limit**
 _db._**nombreColeccion**_.find.().limit(_ **numeroValoresMostrar** _)_
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({},{_id:0}).limit(5)
 ```
@@ -518,7 +520,7 @@ _db._**nombreColeccion**_.find.().limit(_ **numeroValoresMostrar** _)_
 
 #### **skip**
 _db._**nombreColeccion**_.find.().skip(_ **numeroValoresOmitir** _)_
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({},{_id:0}).skip(10).limit(5)
 ```
@@ -534,23 +536,23 @@ _db._**nombreColeccion**_.find.().skip(_ **numeroValoresOmitir** _)_
 
 #### **count vs size**
 _db._**nombreColeccion**_.find.( ).skip(_ **numeroValoresOmitidos** _).size( )_
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({},{_id:0}).sort({valor:1}).skip(10).size()
 ```
 ```javascript
 90
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({},{_id:0}).skip(10).count()
 ```
 ```javascript
 100
 ```
-##### ***Nota 1***
+###### ***Nota 1***
     count: Devuelve el numero total de documentos encontrados dentro el metodo find()
-    size: Devuelve el numero de documentos restantes dentro del skip [count - skip]
+    size: Devuelve el numero de documentos restantes dentro del skip [size = count - skip]
 
 <br><br><br><br>
 
@@ -560,7 +562,7 @@ _db._**nombreColeccion**_.save(_
 _{_ **_id o documento**  _},_ 
 _{_ **campoNombre** _:_ **nuevoValor** _} )_
 
-##### *shell* 
+###### *shell* 
 ```javascript
 > db.persona.save( { "_id" : ObjectId("5d057016581553215508f3bc") }, { edad : 30 })
 ```
@@ -568,10 +570,10 @@ _{_ **campoNombre** _:_ **nuevoValor** _} )_
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
 ___
-##### ***Nota 1***
+###### ***Nota 1***
     Se debe indicar el campo "_id" porque sino se va ha crear un nuevo documento.
     No basta con que los campos de busqueda sean unicos
-##### ***Nota 2***
+###### ***Nota 2***
     En caso de que el campo ha actualizar no exista este se va ha agregar
 ___
 
@@ -595,7 +597,7 @@ _{  multi:_ **boolean** _} )_
     multi: Inidica que se van ha modificar todos los documentos que concidan con los campos de la busqueda en caso de que su valor sea "true".
     Sino se especifica el valor por default es "false" por lo que solo se modificara el primer documento que se encuentre
 
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.update({nombre: "Fernanda"}, {edad: 23, activo: true})
 ```
@@ -605,7 +607,9 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
 <br><br>
 
-#### **Update - Arreglos Parte 1**
+### **Arreglos**
+#### **Agregar**
+##### **push**
 _db._**nombreColeccion**_.update(_ 
 
 _{_ **valoresBusqueda** _},_
@@ -617,21 +621,21 @@ _{ $push : {_ **valoresAñadir** _} )_
 _db._**nombreColeccion**_.update( { },_
 
 _{_ _$addToSet : {_ **valoresAñadir** _} )_
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
 ```javascript
 { "nombre" : "test , "miArreglo" : [ 8, 4, 3] }
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.update( {}, {$addToSet: {miArreglo: 2} })
 ```
 ```javascript
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
@@ -641,14 +645,14 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
 <br>
 
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.update( {}, {$addToSet: {miArreglo: [6, 0]} })
 ```
 ```javascript
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
@@ -656,24 +660,24 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 { "nombre" : "test 1", "miArreglo" : [ 8, 4, 3, 2, [ 6, 0 ] ] }
 ```
 
-##### ***Nota 1***
+###### ***Nota 1***
     Si el elemento ya existe dentro del Array este ya no se volvera ha agregar.
     $push: permite agregar elementos existentes en el array
 
 <br><br>
-#### **Update - Arreglos Parte 2**
+##### **each**
 _db._**nombreColeccion**_.update( { },_
 _{ $push : {_ **nombreArreglo** _:_
 _{ $each : [_ **valor1, valor2, ...**  _]_
 _} )_
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
 ```javascript
 { "nombre" : "test 1", "miArreglo" : [ 8, 4, 3 ] }
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.update( {},
 ... {$push: { miArreglo :
@@ -683,7 +687,7 @@ _} )_
 ```javascript
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
@@ -691,23 +695,23 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 { "nombre" : "test 1", "miArreglo" : [ 8, 4, 3, 2, 3, 6 ] }
 ```
 
-##### ***Nota 1***
+####### ***Nota 1***
     En lugar de usar $push tambien se peuede utilizar $addToSet
 
 <br><br>
-#### **Update - Arreglos Parte 3**
+##### **position**
 _db._**nombreColeccion**_.update( { },_
 _{ $push : {_ **nombreArreglo** _:_
 _{ $position :_ **indiceArreglo**
 _} )_
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
 ```javascript
 { "nombre" : "test 1", "miArreglo" : [ 8, 4, 3 ] }
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.update( {},
 ... {$push: { miArreglo :
@@ -717,7 +721,7 @@ _} )_
 ```javascript
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
@@ -725,23 +729,23 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 { "nombre" : "test 1", "miArreglo" : [ 8, 2, 3, 6, 4, 3 ] }
 ```
 
-##### ***Nota 1***
+###### ***Nota 1***
     El metodo $position solo esta disponible con $push
 
 <br><br>
-#### **Update - Arreglos Parte 4**
+##### **sort**
 _db._**nombreColeccion**_.update( { },_
 _{ $push : {_ **nombreArreglo** _:_
 _{ $sort :_ **[1/-1]**
 _} )_
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
 ```javascript
 { "nombre" : "test 1", "miArreglo" : [ 8, 4, 3 ] }
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.update( {},
 ... {$push: { miArreglo :
@@ -751,7 +755,7 @@ _} )_
 ```javascript
 WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 ```
-##### *shell*
+###### *shell*
 ```javascript
 > db.prueba.find({}, {_id:0})
 ```
@@ -759,10 +763,9 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 { "nombre" : "test 1", "miArreglo" : [ 2, 3, 3, 4, 6, 8 ] }
 ```
 
-##### ***Nota 1***
+###### ***Nota 1***
     Este metodo se puede usar para ordenar el arreglo sino se le pasa ningun valor
-
-
+#### **Eliminar**
 
 
 
@@ -774,7 +777,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 _db._**nombreColeccion**_.remove( {_ **camposBusqueda** _} )_
 
     A diferencia de la funcion update() la funcion remove() elimina todos los documentos que concidan con sus parametros de busqueda
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.remove({ "_id" : ObjectId("5d057016581553215508f3bc") })
 ```
@@ -827,7 +830,7 @@ ___
 + **$gte** *>=* (greater than equals)
 + **$lt**  *<*  (less than)
 + **$lte** *<=* (less than equals)
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.find({edad: {$gt: 20}}, {_id: 0})
 ```
@@ -840,7 +843,7 @@ ___
 ### **Logicos**
 + **$ne** *!=* (Negacion/diferente)
 
-##### *shell*
+###### *shell*
 ```javascript
 > db.persona.find({nombre: {$ne: "Alan"}}, {_id: 0, nombre: 1})
 ```
@@ -856,7 +859,7 @@ ___
 ### **for** 
 _for(_ **varContador** _;_ **limiteCiclo** _;_ **aumento/decremento**_) {_ **funciones** _}_
 
-##### *shell*
+###### *shell*
 ```javascript
 > for(i = 0; i <= 100; i++){
 ... db.cicloFor.insert({valor: i})
