@@ -32,17 +32,21 @@ INDICE
             + [limit - **.limit( )**](#limit)
             + [skip - **.skip( )**](#skip)
             + [count vs size **.size( )**](#count-vs-size)
+        + [Arreglos](#Arreglos---find)
+            + [slice - **.find( { }, _{ }_ )**](#slice)
+            + [in - **.find( _{ }_, { } )**](#in)
     + [Actualizar](#Actualizar)
         + [save - **.save( )**](#save)
         + [update - **.update( )**](#update)
         + [Arreglos - **.update( { }, _{ }_ )**](#Arreglos)
-            + [Agregar - **$push: _{ }_**](#Agregar) 
+            + [Agregar - **$push: _{ }_**](#Agregar---update) 
                 + [push - **$push: _{ }_**](#push) 
                 + [each - **$each: [ ]**](#each)
                 + [position - **$position**](#position)
                 + [sort - **$sort**](#sort)
-            + [Eliminar](#Eliminar)
-    + [Eliminar](#crudEliminar)
+            + [Eliminar](#Eliminar---update-(arreglos))
+                + [pull - **$pull: {}**](#pull)
+    + [Eliminar](#CRUD/Eliminar)
         + [remove - **.remove( )**](#remove)
 + [Funciones](#Funciones) 
     + [Varibles](#Variables)
@@ -126,7 +130,7 @@ local   0.000GB
 switched to db Pruebas
 ```
 ___
-###### ***Nota***
+###### ***Nota 1***
     Si la DB no existe entonces se va ha crear, pero esta no aparecera en la lista de DB hasta que se carguen datos en esta
 ___
 
@@ -273,7 +277,7 @@ BulkWriteResult({
 ```
 
 <br><br>
-### **Arreglos**
+### **Arreglos - update**
 _db._**nombreColeccion**_.insert ( {_
 **nombreArreglo** _: [_ **valor1, valor2, ...** _] } )_
 ###### *shell*
@@ -353,9 +357,9 @@ _{_ **parametrosBusqueda** _},_
 _{_ **campo1** _:_ **1**_,_ **campo2** _:_ **0**_,_ **...** _} )_
 
 
-_Se especifica un 0 para excluir el valor_
+_Se especifica un **0** o **false** para excluir el valor_
 
-_Se especifica un 1 para mostrar el valor_
+_Se especifica un **1** o **true** para mostrar el valor_
 
 ###### *shell*
 ```javascript
@@ -554,6 +558,94 @@ _db._**nombreColeccion**_.find.( ).skip(_ **numeroValoresOmitidos** _).size( )_
     count: Devuelve el numero total de documentos encontrados dentro el metodo find()
     size: Devuelve el numero de documentos restantes dentro del skip [size = count - skip]
 
+<br><br>
+
+### **Arreglos - find
+#### **slice** 
+_db._**nombreColeccion**_find( { },_
+_{_ **nombreArreglo** _:_ _{$slice :_ **numeroElementos** _} } )_ 
+
+###### *shell*
+```javascript
+> db.prueba.find({},{_id:false}).pretty()
+```
+```javascript
+{
+        "miArreglo" : [
+                "C#",
+                "JavaScript",
+                "Python",
+                "Visual Basic",
+                "Java"
+        ]
+}
+```
+###### *shell*
+```javascript
+> db.prueba.find({},{_id:false, miArreglo: {$slice: 3}})
+```
+```javascript
+{ "miArreglo" : [ "C#", "JavaScript", "Python" ] }
+```
+###### *shell*
+```javascript
+> db.prueba.find({},{_id:false, miArreglo: {$slice: -3}})
+```
+```javascript
+{ "miArreglo" : [ "Python", "Visual Basic", "Java" ] }
+```
+###### *shell*
+```javascript
+> db.prueba.find({},{_id:false, miArreglo: {$slice: [1, 3]}})
+```
+```javascript
+{ "miArreglo" : [ "JavaScript", "Python", "Visual Basic" ] }
+```
+
+<br><br>
+
+#### **in** 
+_db._**nombreColeccion**_.find(_
+_{ **nombreArreglo** _: { $in : [_ **valoresBusqueda** _] } )_ 
+
+Para negra la busqueda, excluir las concidencias usar:
+    $nin
+
+###### *shell*
+```javascript
+> db.prueba.find({},{_id:false}).pretty()
+```
+```javascript
+{
+        "miArreglo" : [
+                "C#",
+                "JavaScript",
+                "Python",
+                "Visual Basic",
+                "Java"
+        ]
+}
+```
+###### *shell*
+```javascript
+> db.prueba.find({miArreglo: {$in: ["C#", "SQL"]} }, {_id: false} )
+```
+```javascript
+{ "miArreglo" : [ "C#", "JavaScript", "Python", "Visual Basic", "Java" ] }
+```
+
+###### ***Nota 1***
+    Solo es necesario una concidencia de todos los parametros de busqueda para que este retorne el documento
+
+
+
+
+
+
+
+
+
+
 <br><br><br><br>
 
 ## Actualizar
@@ -608,7 +700,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 <br><br>
 
 ### **Arreglos**
-#### **Agregar**
+#### **Agregar - update**
 ##### **push**
 _db._**nombreColeccion**_.update(_ 
 
@@ -665,6 +757,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
     $push: permite agregar elementos existentes en el array
 
 <br><br>
+
 ##### **each**
 _db._**nombreColeccion**_.update( { },_
 _{ $push : {_ **nombreArreglo** _:_
@@ -695,7 +788,7 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 { "nombre" : "test 1", "miArreglo" : [ 8, 4, 3, 2, 3, 6 ] }
 ```
 
-####### ***Nota 1***
+###### ***Nota 1***
     En lugar de usar $push tambien se peuede utilizar $addToSet
 
 <br><br>
@@ -765,7 +858,70 @@ WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
 
 ###### ***Nota 1***
     Este metodo se puede usar para ordenar el arreglo sino se le pasa ningun valor
-#### **Eliminar**
+
+<br><br>
+
+#### **Eliminar - update (arreglos)**
+##### **pull** 
+_db._**nombreColeccion**_.update( { },_
+_{ $pull : {_ **nombreArreglo** _:_ **valorArreglo** _)_
+
+_db._**nombreColeccion**_.update( { },_
+_{ $pullAll : {_ **nombreArreglo** _: [_ **valor1, valor2, ...** _] )_
+###### *shell*
+```javascript
+> var arreglo = new Array();
+> var tamanoArray = 20;
+> for (i = 1; i <= tamanoArray; i++){
+...     arreglo.push(Math.round(Math.random()*100));
+... }
+> db.prueba.insert({nombre: "test 1", miArreglo: arreglo} )
+```
+```javascript
+WriteResult({ "nInserted" : 1 })
+```
+###### *shell*
+```javascript
+> db.prueba.find()
+```
+```javascript
+{ "_id" : ObjectId("5d08006569eac3f57c534494"), "nombre" : "test 1", "miArreglo" : [ 36, 80, 47, 14, 9 ] }
+```
+###### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "_id" : ObjectId("5d0801d069eac3f57c534495"), "nombre" : "test 1", "miArreglo" : [ 36, 80, 47, 14, 9, 69, 92, 21, 22, 65, 4, 36, 9, 22, 34, 23, 59, 97, 33, 92 ] }
+```
+###### *shell*
+```javascript
+> db.prueba.find({}, {_id:0})
+```
+```javascript
+{ "_id" : ObjectId("5d0801d069eac3f57c534495"), "nombre" : "test 1", "miArreglo" : [ 36, 80, 47, 14, 9, 69, 92, 21, 22, 65, 4, 36, 9, 22, 34, 23, 59, 97, 33, 92 ] }
+```
+###### *shell*
+```javascript
+> db.prueba.update({}, {$pull: {miArreglo: {$gte: 50} } } )
+```
+```javascript
+WriteResult({ "nMatched" : 1, "nUpserted" : 0, "nModified" : 1 })
+```
+###### *shell*
+```javascript
+> db.prueba.find({}, {_id: 0} )
+```
+```javascript
+{ "nombre" : "test 1", "miArreglo" : [ 36, 47, 14, 9, 21, 22, 4, 36, 9, 22, 34, 23, 33 ] }
+```
+
+###### ***Nota 1***
+    Para eliminar varios valores manualmente se utiliza:
+    $pullAll: [valor1, valor2, ...]
+
+<br><br>
+
 
 
 
@@ -851,6 +1007,8 @@ ___
 { "nombre" : "Isaac" }
 { "nombre" : "Fernanda" }
 ```
+
+
 
 
 <br><br><br><br>
