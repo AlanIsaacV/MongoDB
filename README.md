@@ -1,4 +1,4 @@
-MongoDB Usos y comandos
+Guia de **MongoDB** _Usos y comandos_
 =======================
 INDICE 
 ------
@@ -13,7 +13,7 @@ INDICE
         + [Crear Coleccion (Explicito) - **createCollection( )**](#Crear-coleccion-de-manera-explicita)
         + [Mostrar Colecciones - **show collections**](#Mostrar-Colecciones)
         + [Eliminar Coleccion - **.drop( )**](#Eliminar-coleccion)
-        + [Eliminar DB - **dropDatabase( )**](#Eliminar-DB)
+        + [Eliminar DB - **.dropDatabase( )**](#Eliminar-DB)
 + [CRUD](#crud)
     + [Crear](#Crear)
         + [Un documento - **.insert( )**](#Un-documento)
@@ -39,14 +39,14 @@ INDICE
         + [save - **.save( )**](#save)
         + [update - **.update( )**](#update)
         + [Arreglos - **.update( { }, _{ }_ )**](#Arreglos)
-            + [Agregar - **$push: _{ }_**](#Agregar---update) 
+            + [Agregar - **$push: _{ }_**](#Agregar---update)
                 + [push - **$push: _{ }_**](#push) 
                 + [each - **$each: [ ]**](#each)
                 + [position - **$position**](#position)
                 + [sort - **$sort**](#sort)
             + [Eliminar](#Eliminar---update-(arreglos))
                 + [pull - **$pull: {}**](#pull)
-    + [Eliminar](#CRUD/Eliminar)
+    + [Eliminar](#Eliminar)
         + [remove - **.remove( )**](#remove)
 + [Funciones](#Funciones) 
     + [Varibles](#Variables)
@@ -55,9 +55,12 @@ INDICE
         + [Logicos](#Logicos)
     + [Bucles](#Bucles)
         + [for](#for)
-
-
-
++ [Avanzado - **aggregate( _[ ]_ )**](#Avanzado)
+    + [Grupos - **$group _{ }_**](#Group)
+        + [Agrupacion - **$group _{ }_**](#Agrupacion)
+        + [Repeticion de grupos - **$sum : 1**](#Repeticion-de-grupos)
+        + [Suma de campos - **$sum:_{ }_**](#suma-de-campos-por-grupo)
+        + [promedio - **$avg: _{ }_**](#Promedio-de-grupos)
 
 
 ___
@@ -560,7 +563,7 @@ _db._**nombreColeccion**_.find.( ).skip(_ **numeroValoresOmitidos** _).size( )_
 
 <br><br>
 
-### **Arreglos - find
+### **Arreglos - find**
 #### **slice** 
 _db._**nombreColeccion**_find( { },_
 _{_ **nombreArreglo** _:_ _{$slice :_ **numeroElementos** _} } )_ 
@@ -636,15 +639,6 @@ Para negra la busqueda, excluir las concidencias usar:
 
 ###### ***Nota 1***
     Solo es necesario una concidencia de todos los parametros de busqueda para que este retorne el documento
-
-
-
-
-
-
-
-
-
 
 <br><br><br><br>
 
@@ -1029,4 +1023,91 @@ WriteResult({ "nInserted" : 1 })
 
 Esto inserta valores del 0 al 100 en la coleccion **cicloFor**
 
-<br><br>
+<br><br><br><br><br><br><br><br>
+
+
+# Avanzado
+## aggregate
+### **group**
+#### **Agrupacion**
+_db._**nombreColeccion**_.aggregate( [ {_
+    _$group : "_ **nombreCampoAgrupar** _"} ] )_
+
+###### *shell* 
+```javascript
+> db.peliculas.insert([
+... {categoria: "accion", nombre: "2 Guns", valor: 100},
+... {categoria: "accion", nombre: "Ant-Man", valor: 50},
+... {categoria: "accion", nombre: "Avatar 3", valor: 150},
+... {categoria: "Ciencia Ficcion", nombre: "Alien", valor: 200},
+... {categoria: "Comedia", nombre: "The Adventure", valor: 300},
+... {categoria: "Comedia", nombre: "Agua y Sal", valor: 250}
+])
+```
+```javascript
+BulkWriteResult({
+        "writeErrors" : [ ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 6,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+})
+```
+###### *shell* 
+```javascript
+> db.peliculas.aggregate( [ {$group : {_id: "$categoria"} } ] )
+```
+```javascript
+{ "_id" : "Comedia" }
+{ "_id" : "Ciencia Ficcion" }
+{ "_id" : "accion" }
+```
+<br>
+
+#### **Repeticion de grupos**
+###### *shell* 
+```javascript
+> db.peliculas.aggregate( [ {$group : {_id: "$categoria", "repetidos": {$sum: 1}} } ] )
+```
+```javascript
+{ "_id" : "Comedia", "repetidos" : 2 }
+{ "_id" : "Ciencia Ficcion", "repetidos" : 1 }
+{ "_id" : "accion", "repetidos" : 3 }
+```
+<br>
+
+#### **Suma de campos por grupo**
+###### *shell* 
+```javascript
+> db.peliculas.aggregate( [ {$group : {_id: "$categoria", "repetidos": {$sum: 1}, "sumaValor": {$sum: "$valor" } } } ] )
+```
+```javascript
+{ "_id" : "Comedia", "repetidos" : 2, "sumaValor" : 550 }
+{ "_id" : "Ciencia Ficcion", "repetidos" : 1, "sumaValor" : 200 }
+{ "_id" : "accion", "repetidos" : 3, "sumaValor" : 300 }
+```
+<br>
+
+#### **Promedio de grupos**
+###### *shell* 
+```javascript
+> db.peliculas.aggregate( [ {$group : {
+..._id: "$categoria", 
+..."repetidos": {$sum: 1}, 
+..."sumaValor": {$sum: "$valor" }, 
+...promedioValor: {$avg: "$valor"} 
+...} } ] )
+```
+```javascript
+{ "_id" : "Comedia", "repetidos" : 2, "sumaValor" : 550 }
+{ "_id" : "Ciencia Ficcion", "repetidos" : 1, "sumaValor" : 200 }
+{ "_id" : "accion", "repetidos" : 3, "sumaValor" : 300 }
+```
+<br>
+
+
+
+
