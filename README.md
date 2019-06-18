@@ -55,13 +55,17 @@ INDICE
         + [Logicos](#Logicos)
     + [Bucles](#Bucles)
         + [for](#for)
-+ [Avanzado - **aggregate( _[ ]_ )**](#Avanzado)
-    + [Grupos - **$group _{ }_**](#Group)
++ [Avanzado](#Avanzado)
+    + [Grupos - **aggregate( _[ ]_ )**](#Group)
         + [Agrupacion - **$group _{ }_**](#Agrupacion)
         + [Repeticion de grupos - **$sum : 1**](#Repeticion-de-grupos)
         + [Suma de campos - **$sum:_{ }_**](#suma-de-campos-por-grupo)
         + [promedio - **$avg: _{ }_**](#Promedio-de-grupos)
-
++ [Expresiones regulares - **.find ( _{ }_ )**](#Expresiones-regulares)
+    + [Like - ***/ /***](#'Like')
+        + [Cualquier zona - ***/ /***](#Cualquier-zona)
+        + [Al final - **/  _$_/**](#Al-final)
+        + [Al inicio - **/_^_ /**](#Al-inicio)
 
 ___
 <br><br><br>
@@ -1106,8 +1110,74 @@ BulkWriteResult({
 { "_id" : "Ciencia Ficcion", "repetidos" : 1, "sumaValor" : 200 }
 { "_id" : "accion", "repetidos" : 3, "sumaValor" : 300 }
 ```
+<br><br><br><br>
+
+## Expresiones regulares
+### **'Like'**
+###### *shell*
+```javascript
+> db.prueba.insert ([
+... {correo: "alan@gmail.com"},
+... {correo: "alan@outlook.com"},
+... {correo: "test@live.mx"}
+... ])
+```
+```javascript
+BulkWriteResult({
+        "writeErrors" : [ ],
+        "writeConcernErrors" : [ ],
+        "nInserted" : 3,
+        "nUpserted" : 0,
+        "nMatched" : 0,
+        "nModified" : 0,
+        "nRemoved" : 0,
+        "upserted" : [ ]
+})
+```
 <br>
 
+#### **Cualquier zona**
+__/__ *texto*  __/__ 
 
+Busca contenido ingresado en ***cualquier*** parte del texto
+
+###### *shell*
+```javascript
+> db.prueba.find({correo: /@g/})
+```
+```javascript
+{ "_id" : ObjectId("5d08ec22ad79d8f46660eef4"), "correo" : "alan@gmail.com" }
+```
+
+<br>
+
+#### **Al final**
+__/__ *texto*__$ /__ 
+
+Busca contenido ingresado al ***final*** del texto
+###### *shell*
+```javascript
+> db.prueba.find({correo: /mx$/})
+```
+```javascript
+{ "_id" : ObjectId("5d08ec22ad79d8f46660eef6"), "correo" : "test@live.mx" }
+```
+
+<br>
+
+#### **Al inicio**
+__/ ^__ *texto* __/__ 
+
+busca contenido ingresado al ***inicio*** parte del texto
+###### *shell*
+```javascript
+> db.prueba.find({correo: /^a/})
+```
+```javascript
+{ "_id" : ObjectId("5d08ec22ad79d8f46660eef4"), "correo" : "alan@gmail.com" }
+{ "_id" : ObjectId("5d08ec22ad79d8f46660eef5"), "correo" : "alan@outlook.com" }
+```
+
+<br><br><br><br>
 
 
